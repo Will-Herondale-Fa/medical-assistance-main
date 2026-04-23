@@ -111,6 +111,18 @@ export const extractJitsiRoomName = (meetingLink) => {
   }
 };
 
+export const isPublicJitsiHost = (meetingLink) => {
+  try {
+    const hostname = new URL(String(meetingLink || "")).hostname.toLowerCase();
+    return hostname === "meet.jit.si" || hostname.endsWith(".meet.jit.si");
+  } catch {
+    return false;
+  }
+};
+
+export const canUseInAppJitsiEmbed = (meetingLink) =>
+  Boolean(meetingLink) && !isPublicJitsiHost(meetingLink);
+
 export const normalizeMeetingLinkForPlatform = (meetingLink, platform) => {
   const parsed = new URL(String(meetingLink || "").trim());
 

@@ -3,7 +3,11 @@ import "../styles/PatientDashboard.css";
 import { Link } from "react-router-dom";
 import api from "../api/axios";
 import socket from "../socket/socket";
-import { inferConsultationPlatform, platformLabel } from "../utils/consultation";
+import {
+  canUseInAppJitsiEmbed,
+  inferConsultationPlatform,
+  platformLabel,
+} from "../utils/consultation";
 
 const CONSULTATION_STORAGE_KEY = "medibot:lastConsultationSession";
 const LEGACY_CONSULTATION_LINK_KEY = "medibot:lastConsultationLink";
@@ -64,7 +68,9 @@ const PatientDashboard = () => {
     consultationSession?.platform || inferConsultationPlatform(consultationLink)
   );
   const isJitsiEmbeddedMode =
-    consultationSession?.platform === "jitsi" && consultationSession?.openMode === "in-app";
+    consultationSession?.platform === "jitsi" &&
+    consultationSession?.openMode === "in-app" &&
+    canUseInAppJitsiEmbed(consultationLink);
   const embeddedJitsiUrl = isJitsiEmbeddedMode
     ? getEmbeddedJitsiUrl(consultationLink)
     : "";

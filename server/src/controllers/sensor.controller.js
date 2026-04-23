@@ -1,5 +1,8 @@
 import SensorData from "../models/sensor.model.js";
-import { getLatestSensorSample, setLatestSensorSample } from "../state/liveSensorCache.js";
+import {
+  getFreshLatestSensorSample,
+  setLatestSensorSample,
+} from "../state/liveSensorCache.js";
 
 const toNumber = (value) => {
   if (value === "" || value === undefined || value === null) {
@@ -58,13 +61,8 @@ export const saveSensorData = async (req, res) => {
 
 export const getLatestSensorData = async (_req, res) => {
   try {
-    const cached = getLatestSensorSample();
-    if (cached) {
-      return res.status(200).json(cached);
-    }
-
-    const latest = await SensorData.findOne().sort({ createdAt: -1 });
-    return res.status(200).json(latest);
+    const cached = getFreshLatestSensorSample(45_000);
+    return res.status(200).json(cached);
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }

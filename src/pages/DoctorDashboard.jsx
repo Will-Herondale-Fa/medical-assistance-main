@@ -9,6 +9,7 @@ import { commonMedicines } from "../utils/commonMedicines";
 import { clearDoctorToken } from "../utils/auth";
 import {
   buildJitsiMeetingLink,
+  canUseInAppJitsiEmbed,
   createAutoJitsiRoom,
   extractJitsiRoomName,
   inferConsultationPlatform,
@@ -109,8 +110,8 @@ export default function DoctorDashboard() {
     const fetchLatestSensor = async () => {
       try {
         const res = await api.get("/sensors/latest");
-        if (mounted && res.data) {
-          setSensorData(res.data);
+        if (mounted) {
+          setSensorData(res.data || null);
         }
       } catch (error) {
         console.error("Latest sensor fetch failed:", error);
@@ -248,6 +249,46 @@ export default function DoctorDashboard() {
     return () => clearInterval(timer);
   }, []);
 
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setSensorData((prev) => {
+        if (!prev?.createdAt) {
+          return prev;
+        }
+        const ageMs = Date.now() - new Date(prev.createdAt).getTime();
+        return ageMs > 45_000 ? null : prev;
+      });
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    let jitsiLink = consultationDraft.meetingLink;
+    if (!jitsiLink && consultationDraft.roomName) {
+      try {
+        jitsiLink = buildJitsiMeetingLink(consultationDraft.roomName);
+      } catch {
+        jitsiLink = "";
+      }
+    }
+    if (
+      consultationDraft.platform === "jitsi" &&
+      consultationDraft.openMode === "in-app" &&
+      jitsiLink &&
+      !canUseInAppJitsiEmbed(jitsiLink)
+    ) {
+      setConsultationDraft((prev) => ({
+        ...prev,
+        openMode: "external",
+      }));
+    }
+  }, [
+    consultationDraft.platform,
+    consultationDraft.openMode,
+    consultationDraft.meetingLink,
+    consultationDraft.roomName,
+  ]);
+
   const handleMedicineChange = (index, field, value) => {
     const updated = [...medicines];
     updated[index][field] = value;
@@ -294,12 +335,16 @@ export default function DoctorDashboard() {
       }
 
       const normalizedLink = normalizeMeetingLinkForPlatform(jitsiLink, "jitsi");
+      const supportsInAppEmbed = canUseInAppJitsiEmbed(normalizedLink);
 
       return {
         ...basePayload,
         meetingLink: normalizedLink,
         roomName: extractJitsiRoomName(normalizedLink) || nextRoomName,
-        openMode: consultationDraft.openMode === "in-app" ? "in-app" : "external",
+        openMode:
+          consultationDraft.openMode === "in-app" && supportsInAppEmbed
+            ? "in-app"
+            : "external",
       };
     }
 
@@ -457,6 +502,9 @@ export default function DoctorDashboard() {
       return "";
     }
   })();
+  const jitsiCanEmbedInApp = canUseInAppJitsiEmbed(
+    consultationDraft.meetingLink || jitsiPreviewLink
+  );
 
   return (
     <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_#dff7ff_0%,_#edf9ff_28%,_#f8fbff_55%,_#eefbf4_100%)]">
@@ -895,9 +943,17 @@ export default function DoctorDashboard() {
                       }
                       className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
                     >
-                      <option value="in-app">Open inside patient dashboard (embedded Jitsi)</option>
+                      <option value="in-app" disabled={!jitsiCanEmbedInApp}>
+                        Open inside patient dashboard (embedded Jitsi)
+                      </option>
                       <option value="external">Open in new browser tab</option>
                     </select>
+                    {!jitsiCanEmbedInApp ? (
+                      <p className="mt-2 text-xs text-amber-700">
+                        Public meet.jit.si rooms do not support reliable in-app embedding.
+                        External mode is used automatically.
+                      </p>
+                    ) : null}
                   </div>
                 </>
               ) : (

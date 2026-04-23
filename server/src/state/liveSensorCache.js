@@ -8,3 +8,16 @@ export const setLatestSensorSample = (sample) => {
 };
 
 export const getLatestSensorSample = () => latestSensorSample;
+
+export const getFreshLatestSensorSample = (maxAgeMs = 45_000) => {
+  if (!latestSensorSample?.createdAt) {
+    return null;
+  }
+
+  const ageMs = Date.now() - new Date(latestSensorSample.createdAt).getTime();
+  if (!Number.isFinite(ageMs) || ageMs > maxAgeMs) {
+    return null;
+  }
+
+  return latestSensorSample;
+};
