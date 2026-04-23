@@ -1,10 +1,23 @@
-# medical assistance
+# Medical Assistance
 
-medical assistance is a Node.js-based backend and REactJS web application for managing patient vitals, generating prescriptions, and providing a real-time dashboard for doctors. It is designed for clinics or healthcare providers to streamline patient data collection and prescription management.
+Medical Assistance is a React + Node.js app for clinic workflows:
+- Real-time vitals feed
+- Doctor dashboard and patient view
+- Prescription generation and print-agent integration
+- Secure doctor auth
+- Multi-platform consultation sessions (Jitsi, Google Meet, Zoom, Teams, custom HTTPS link)
 
-## Required backend environment variables
+## Core Features
 
-The backend now fails fast on startup if any of these are missing:
+- Live sensor updates via Socket.IO
+- Protected doctor actions (auth-required APIs and socket role auth)
+- Prescription PDF generation and optional local auto-print agent
+- Consultation session management with platform validation
+- Optional in-app Jitsi patient embed mode
+
+## Required Backend Environment Variables
+
+The backend now fails fast on startup if any required variable is missing.
 
 - `DOCTOR_EMAIL`
 - `DOCTOR_PASSWORD`
@@ -12,193 +25,78 @@ The backend now fails fast on startup if any of these are missing:
 - `SENSOR_INGEST_SECRET`
 - `PRINT_AGENT_SECRET`
 
+Also required for database connectivity:
+- `MONGO_URI`
+
 Use [server/.env.example](server/.env.example) as the template.
 
-## Deployment notes (Vercel / Render)
+## Frontend Environment Variables
 
-- Render is recommended for the Node backend because this app uses long-lived Socket.IO and raw WebSocket connections.
-- Vercel works well for the React frontend build.
-- When frontend and backend are on different domains, set frontend env vars from [.env.example](.env.example):
-   - `VITE_API_BASE_URL=https://your-backend-domain/api`
-   - `VITE_SOCKET_URL=https://your-backend-domain`
-- On the backend, set `CORS_ORIGINS` to frontend URL(s), comma-separated.
+Use [.env.example](.env.example) for frontend configuration.
 
-## Features
+- `VITE_API_BASE_URL` (example: `https://your-api-domain.onrender.com/api`)
+- `VITE_SOCKET_URL` (example: `https://your-api-domain.onrender.com`)
 
-- **Patient Vitals API**: Receives and stores patient vitals (temperature, pulse, weight) via REST API.
-- **Real-Time Dashboard**: Uses Socket.IO to broadcast new data to connected clients instantly.
-- **Prescription Generation**: Generates professional PDF prescriptions with patient and doctor details, vitals, diagnosis, and medications.
-- **Multi-Platform Consultation**: Supports Jitsi Meet (including in-app patient embed), Google Meet, Zoom, Teams, and custom secure call links.
-- **Static Web Frontend**: Includes multiple HTML pages for login, dashboard, patient details, and more.
-- **History Tracking**: Maintains a history of the latest 500 vitals entries.
-- **CORS Enabled**: Allows cross-origin requests for easy integration.
+If these are omitted in production, frontend defaults to same-origin behavior.
 
-## Consultation Platforms
+## Local Development
 
-- Doctors can publish consultation sessions from the dashboard using:
-  - Jitsi Meet (with optional in-app patient embed mode)
-  - Google Meet
-  - Zoom
-  - Microsoft Teams
-  - Any custom HTTPS call link
-- Patients automatically receive live updates over Socket.IO and can join in one tap.
+1. Install dependencies:
+```bash
+npm install
+npm --prefix server install
+npm --prefix print-agent install
+```
 
-## Render Deployment (Recommended)
+2. Configure env files:
+- Create `server/.env` from `server/.env.example`
+- Optionally create root `.env` from `.env.example`
 
-This repo includes [render.yaml](render.yaml) for one-click blueprint deployment.
+3. Start frontend and backend:
+```bash
+npm run dev
+npm run server
+```
 
-1. Push this repository to GitHub.
-2. In Render, use **New +** -> **Blueprint** and select this repository.
-3. Create both services from `render.yaml`:
-   - `medical-assistance-api` (Node web service)
-   - `medical-assistance-web` (static frontend)
-4. Set environment variables on the backend service:
-   - `MONGO_URI`
-   - `DOCTOR_EMAIL`
-   - `DOCTOR_PASSWORD`
-   - `DOCTOR_AUTH_SECRET`
-   - `SENSOR_INGEST_SECRET`
-   - `PRINT_AGENT_SECRET`
-   - `CORS_ORIGINS` (set to your frontend URL)
-   - `FRONTEND_URL` (same frontend URL)
-5. Set environment variables on the frontend service:
-   - `VITE_API_BASE_URL` = `https://<your-api-domain>/api`
-   - `VITE_SOCKET_URL` = `https://<your-api-domain>`
+4. (Optional) Start print agent on a machine with printer access:
+```bash
+npm run print-agent
+```
 
-## Project Structure
-my-app/
-│
-├── public/
-│   ├── index.html
-│   ├── favicon.ico
-│   └── assets/
-│
-├── src/
-│   │
-│   ├── app/                     # App-level setup (root config)
-│   │   ├── App.tsx
-│   │   ├── main.tsx
-│   │   ├── routes.tsx
-│   │   ├── providers.tsx        # Context/Redux/Query providers
-│   │   └── store.ts             # Redux store (if using)
-│   │
-│   ├── features/                # Feature-based modules (🔥 scalable)
-│   │   ├── auth/
-│   │   │   ├── api.ts
-│   │   │   ├── authSlice.ts
-│   │   │   ├── components/
-│   │   │   ├── hooks/
-│   │   │   ├── pages/
-│   │   │   ├── types.ts
-│   │   │   └── index.ts
-│   │   │
-│   │   ├── dashboard/
-│   │   └── users/
-│   │
-│   ├── components/              # Shared reusable UI components
-│   │   ├── ui/                  # Button, Input, Modal, etc.
-│   │   ├── layout/              # Navbar, Sidebar, Footer
-│   │   └── common/              # Generic shared pieces
-│   │
-│   ├── hooks/                   # Global reusable hooks
-│   │   ├── useDebounce.ts
-│   │   ├── useLocalStorage.ts
-│   │   └── index.ts
-│   │
-│   ├── services/                # API layer (axios/fetch config)
-│   │   ├── apiClient.ts
-│   │   ├── interceptors.ts
-│   │   └── endpoints.ts
-│   │
-│   ├── lib/                     # 3rd-party configs
-│   │   ├── axios.ts
-│   │   ├── react-query.ts
-│   │   └── i18n.ts
-│   │
-│   ├── utils/                   # Pure utility functions
-│   │   ├── formatDate.ts
-│   │   ├── validators.ts
-│   │   └── constants.ts
-│   │
-│   ├── types/                   # Global TypeScript types
-│   │   ├── api.ts
-│   │   └── index.ts
-│   │
-│   ├── styles/
-│   │   ├── globals.css
-│   │   └── variables.css
-│   │
-│   └── assets/
-│       ├── images/
-│       ├── icons/
-│       └── fonts/
-│
-├── .env
-├── .env.production
-├── tsconfig.json
-├── vite.config.ts / webpack.config.js
-└── package.json
+## Deployment (Render Recommended)
 
-## API Endpoints
+This repo includes [render.yaml](render.yaml) for Blueprint deployment.
 
-### POST `/api/data`
-- **Description**: Submit patient vitals.
-- **Headers**: `x-api-key: <API_KEY>`
-- **Body**:
-  ```json
-  {
-    "temperature_c": 36.5,
-    "pulse_bpm": 80,
-    "weight_kg": 70,
-    "ts": "2026-02-27T10:00:00Z"
-  }
-  ```
-- **Response**: `{ status: 'success' }`
+1. Push this repo to GitHub.
+2. In Render: **New +** -> **Blueprint** -> select this repository.
+3. Render will create:
+- `medical-assistance-api` (Node web service)
+- `medical-assistance-web` (Static site)
+4. Set backend env vars:
+- `MONGO_URI`
+- `DOCTOR_EMAIL`
+- `DOCTOR_PASSWORD`
+- `DOCTOR_AUTH_SECRET`
+- `SENSOR_INGEST_SECRET`
+- `PRINT_AGENT_SECRET`
+- `CORS_ORIGINS` (frontend URL, comma-separated if multiple)
+- `FRONTEND_URL` (optional explicit frontend URL)
+5. Set frontend env vars:
+- `VITE_API_BASE_URL=https://<api-domain>/api`
+- `VITE_SOCKET_URL=https://<api-domain>`
 
-### GET `/api/latest`
-- **Description**: Get the latest vitals data.
-- **Response**: Latest data object.
+## Vercel + Render Split (Alternative)
 
-### GET `/api/history`
-- **Description**: Get the history of vitals (up to 500 entries).
-- **Response**: `{ items: [ ... ] }`
+- Deploy frontend on Vercel
+- Deploy backend on Render
+- Configure:
+  - `VITE_API_BASE_URL` and `VITE_SOCKET_URL` on Vercel
+  - `CORS_ORIGINS` on Render backend to include the Vercel frontend URL
 
-### POST `/api/prescriptions`
-- **Description**: Generate a PDF prescription for a patient.
-- **Body**: Patient, doctor, diagnosis, and medication details.
-- **Response**: `{ status: 'success', url: '/prescriptions/<file>.pdf' }`
+## Health Check
 
-## How It Works
+- Backend health endpoint: `GET /api/health`
 
-1. **Data Submission**: Devices or clients post vitals to `/api/data` with an API key.
-2. **Real-Time Updates**: All connected dashboards receive new data instantly via Socket.IO.
-3. **Prescription Generation**: Doctors can generate and download PDF prescriptions for patients.
+## Repo
 
-## Setup & Usage
-
-1. **Install dependencies**:
-   ```bash
-   npm install
-   ```
-2. **Start the server**:
-   ```bash
-   node server.js
-   ```
-3. **Access the dashboard**:
-   Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-## Configuration
-
-- **API Key**: Set `API_KEY` in environment variables for secure data submission (default: `dev-secret-key`).
-- **Port**: Set `PORT` in environment variables (default: `3000`).
-
-## Dependencies
-- express
-- socket.io
-- cors
-- pdfkit
-- pdf-to-printer
-
-## License
-
-MIT License
+- GitHub: `https://github.com/Will-Herondale-Fa/medical-assistance-main`

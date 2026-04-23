@@ -12,6 +12,7 @@ npm run print-agent
 ## Required environment variables
 
 - `PRINT_AGENT_SECRET` (must match backend `PRINT_AGENT_SECRET`)
+- Copy values from `print-agent/.env.example` as needed.
 
 ## Optional environment variables
 
