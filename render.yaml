@@ -1,0 +1,45 @@
+services:
+  - type: web
+    name: medical-assistance-api
+    env: node
+    rootDir: server
+    plan: free
+    autoDeploy: true
+    healthCheckPath: /api/health
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: MONGO_URI
+        sync: false
+      - key: DOCTOR_EMAIL
+        sync: false
+      - key: DOCTOR_PASSWORD
+        sync: false
+      - key: DOCTOR_AUTH_SECRET
+        sync: false
+      - key: SENSOR_INGEST_SECRET
+        sync: false
+      - key: PRINT_AGENT_SECRET
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+
+  - type: static
+    name: medical-assistance-web
+    rootDir: .
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    pullRequestPreviewsEnabled: false
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_BASE_URL
+        sync: false
+      - key: VITE_SOCKET_URL
+        sync: false

@@ -1,0 +1,15 @@
+{
+  "name": "medicalassistance-print-agent",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "start": "node local-print-agent.js",
+    "dev": "node local-print-agent.js"
+  },
+  "dependencies": {
+    "pdf-to-printer": "^5.7.0",
+    "pdfkit": "^0.17.2",
+    "socket.io-client": "^4.8.3"
+  }
+}
