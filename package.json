@@ -8,6 +8,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
+    "postinstall": "npm --prefix server install",
     "start": "npm --prefix server run start",
     "server": "npm --prefix server run dev",
     "print-agent": "npm --prefix print-agent run start"
