@@ -334,7 +334,8 @@ export default function DoctorDashboard() {
         title: nextSession.title || prev.title,
       }));
 
-      if (openAfterShare) {
+      const shouldOpenAfterShare = openAfterShare || nextSession.platform === "jitsi";
+      if (shouldOpenAfterShare) {
         window.open(nextSession.meetingLink, "_blank", "noopener,noreferrer");
       }
 

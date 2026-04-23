@@ -17,9 +17,9 @@ export default function LandingPage() {
           </span>
           <h1 className="text-3xl font-extrabold text-blue-700 tracking-tight animate-fade-in">MediAssist</h1>
         </div>
-        <button className="px-5 py-2 bg-linear-to-r from-blue-600 to-teal-500 text-white rounded-lg shadow hover:scale-105 transition-transform duration-200">
-          Contact Support
-        </button>
+        <span className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700">
+          System Online
+        </span>
       </header>
 
       {/* Hero Section */}
