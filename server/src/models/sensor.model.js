@@ -17,6 +17,12 @@ const sensorSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Patient",
     },
+    source: {
+      type: String,
+      enum: ["live-stream", "prescription"],
+      default: "live-stream",
+      index: true,
+    },
     heartRate: Number,
     temperature: Number,
     spo2: Number,

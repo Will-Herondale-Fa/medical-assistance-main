@@ -179,12 +179,12 @@ const PatientDashboard = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-cyan-100 via-sky-50 to-emerald-100 p-6 md:p-10 relative overflow-hidden">
+    <div className="relative min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top_right,_#d6f4ff_0%,_#e8fbff_30%,_#f2fff8_65%,_#f7fbff_100%)] p-6 md:p-10">
       <div className="absolute -top-10 left-0 h-96 w-96 rounded-full bg-cyan-300 mix-blend-multiply blur-3xl opacity-55 animate-blob"></div>
       <div className="absolute top-10 right-0 h-96 w-96 rounded-full bg-emerald-300 mix-blend-multiply blur-3xl opacity-50 animate-blob animation-delay-2000"></div>
       <div className="absolute bottom-0 left-20 h-96 w-96 rounded-full bg-sky-300 mix-blend-multiply blur-3xl opacity-55 animate-blob animation-delay-4000"></div>
 
-      <div className="relative max-w-6xl mx-auto bg-white/60 backdrop-blur-xl rounded-4xl shadow-2xl p-6 md:p-10 border border-white/50">
+      <div className="relative mx-auto max-w-6xl rounded-[2rem] border border-cyan-100 bg-white/70 p-6 shadow-2xl backdrop-blur-xl md:p-10">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <p className="text-sm uppercase tracking-[0.25em] text-cyan-700 font-semibold">Medibot Patient</p>
@@ -222,7 +222,7 @@ const PatientDashboard = () => {
                 window.open(consultationLink, "_blank", "noopener,noreferrer");
               }}
               disabled={!consultationLink}
-              className="relative z-10 h-56 w-56 md:h-64 md:w-64 rounded-full bg-linear-to-br from-cyan-500 via-sky-600 to-emerald-500 text-white font-black text-xl md:text-2xl shadow-[0_25px_80px_rgba(14,116,144,0.45)] transition-all duration-300 hover:scale-105 active:scale-95 disabled:opacity-55 disabled:cursor-not-allowed disabled:hover:scale-100 flex flex-col items-center justify-center gap-3"
+              className="relative z-10 flex h-56 w-56 flex-col items-center justify-center gap-3 rounded-full bg-gradient-to-br from-cyan-500 via-sky-600 to-emerald-500 text-xl font-black text-white shadow-[0_25px_80px_rgba(14,116,144,0.45)] transition-all duration-300 hover:scale-105 active:scale-95 disabled:cursor-not-allowed disabled:opacity-55 disabled:hover:scale-100 md:h-64 md:w-64 md:text-2xl"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-9 w-9 md:h-10 md:w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
@@ -235,7 +235,7 @@ const PatientDashboard = () => {
           </div>
 
           {consultationLink ? (
-            <div className="mt-8 w-full max-w-3xl rounded-2xl border border-slate-200 bg-white/85 p-4 shadow-lg">
+            <div className="mt-8 w-full max-w-3xl rounded-2xl border border-cyan-100 bg-white/85 p-4 shadow-lg">
               <p className="text-sm text-slate-700">
                 Active platform: <span className="font-semibold text-slate-900">{consultationPlatform}</span>
               </p>

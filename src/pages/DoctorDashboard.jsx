@@ -458,24 +458,25 @@ export default function DoctorDashboard() {
   })();
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-100 via-cyan-50 to-emerald-100">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_#dff7ff_0%,_#edf9ff_28%,_#f8fbff_55%,_#eefbf4_100%)]">
       {/* HEADER */}
-      <header className="sticky top-0 z-10 flex justify-between items-center px-6 md:px-10 py-4 bg-white/90 backdrop-blur-md border-b border-slate-200">
-        <div className="font-medium text-slate-700">
-          Doctor Dashboard
+      <header className="sticky top-0 z-10 flex items-center justify-between border-b border-cyan-100 bg-white/85 px-6 py-4 backdrop-blur-md md:px-10">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-700">Medibot Clinical</p>
+          <h1 className="text-lg font-black text-slate-900 md:text-xl">Doctor Dashboard</h1>
         </div>
         <Link to="/" className="text-cyan-600 hover:underline">
           <button
           onClick={handleLogout}
-          className="bg-rose-500 text-white px-5 py-2 rounded-lg shadow-sm hover:bg-rose-600 transition">
+          className="rounded-xl bg-rose-500 px-5 py-2 font-semibold text-white shadow-sm transition hover:bg-rose-600">
           Logout
           </button>
         </Link>
       
       </header>
 
-      <div className="p-5 md:p-8 space-y-8">
-        <div className="bg-white/90 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+      <div className="space-y-8 p-5 md:p-8">
+        <div className="flex flex-col gap-2 rounded-2xl border border-cyan-100 bg-white/85 px-4 py-3 text-sm text-slate-700 shadow-sm md:flex-row md:items-center md:justify-between">
           <p>
             Live Source: <span className="font-semibold text-slate-900">{livePatientLabel}</span>
           </p>
@@ -485,7 +486,7 @@ export default function DoctorDashboard() {
         </div>
 
         {/* VITALS DASHBOARD */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-5">
           <VitalCard
             title="Current Time"
             value={currentTime.toLocaleTimeString()}
@@ -551,7 +552,7 @@ export default function DoctorDashboard() {
             <button
               type="button"
               onClick={() => setIsConsultationModalOpen(true)}
-              className="bg-cyan-600 text-white text-base md:text-lg px-8 py-3 rounded-xl shadow-lg shadow-cyan-200 hover:bg-cyan-700 transition"
+              className="rounded-xl bg-gradient-to-r from-cyan-600 to-sky-600 px-8 py-3 text-base text-white shadow-lg shadow-cyan-200 transition hover:from-cyan-700 hover:to-sky-700 md:text-lg"
             >
               Configure Consultation
             </button>
@@ -573,7 +574,7 @@ export default function DoctorDashboard() {
             </button>
           </div>
 
-          <div className="mx-auto max-w-3xl rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-lg">
+          <div className="mx-auto max-w-3xl rounded-2xl border border-cyan-100 bg-white/90 p-4 shadow-lg">
             {activeConsultationLink ? (
               <div className="space-y-2">
                 <p className="text-sm text-slate-600">
@@ -595,7 +596,7 @@ export default function DoctorDashboard() {
         </div>
 
         {/* PRESCRIPTION FORM */}
-        <div className="bg-white/95 border border-slate-200 p-6 md:p-8 rounded-2xl shadow-xl shadow-slate-200/70 space-y-7">
+        <div className="space-y-7 rounded-3xl border border-cyan-100 bg-white/95 p-6 shadow-xl shadow-cyan-100/60 md:p-8">
           <div className="flex items-start justify-between gap-3">
             <h2 className="text-2xl font-bold text-slate-900">Prescription & Medical Record</h2>
             <span className="hidden sm:inline-flex text-xs font-semibold tracking-wide uppercase bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full">

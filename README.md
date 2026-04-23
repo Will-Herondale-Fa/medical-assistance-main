@@ -14,6 +14,7 @@ Medical Assistance is a React + Node.js app for clinic workflows:
 - Prescription PDF generation and optional local auto-print agent
 - Consultation session management with platform validation
 - Optional in-app Jitsi patient embed mode
+- Sensor stream is cached live; DB vitals snapshots are persisted on prescription save
 
 ## Backend Environment Variables
 
@@ -24,9 +25,11 @@ You can now run without setting these manually because built-in defaults are app
 - `DOCTOR_AUTH_SECRET` (default included)
 - `SENSOR_INGEST_SECRET` (default included)
 - `PRINT_AGENT_SECRET` (default included)
-- `MONGO_URI` (default: `mongodb://127.0.0.1:27017/medical-assist`)
+- `MONGO_URI` (if provided, it is used as-is and takes priority over defaults)
 
 Use [server/.env.example](server/.env.example) if you want to override.
+
+`PERSIST_SENSOR_STREAM=true` can be enabled if you want every incoming sensor sample stored in MongoDB.
 
 ## Frontend Environment Variables
 

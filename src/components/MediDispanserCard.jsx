@@ -24,7 +24,7 @@ const MediDispanserCard = () => {
     type="button"
     onClick={() => sendLedCommand(color)}
     disabled={activeLed === color}
-    className={`${bgColor} text-white px-4 py-2 rounded-lg ${hoverColor} disabled:opacity-60 disabled:cursor-not-allowed`}
+    className={`rounded-xl ${bgColor} px-4 py-2.5 font-semibold text-white shadow-md transition ${hoverColor} disabled:cursor-not-allowed disabled:opacity-60`}
   >
     {activeLed === color
       ? `${label.toUpperCase()} is Dispensing...`
@@ -33,10 +33,13 @@ const MediDispanserCard = () => {
 );
 
   return (
-    <div className="pt-2">
-      <h3 className="font-semibold text-lg text-slate-900 mb-3">
+    <div className="rounded-2xl border border-slate-200 bg-white/80 p-4 shadow-md">
+      <h3 className="mb-1 text-lg font-bold text-slate-900">
         Medicine Control Panel
       </h3>
+      <p className="mb-4 text-sm text-slate-600">
+        Trigger dispenser commands directly from the prescription workspace.
+      </p>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {renderButton("Paracetamol", "red", "bg-red-500", "hover:bg-red-600")}

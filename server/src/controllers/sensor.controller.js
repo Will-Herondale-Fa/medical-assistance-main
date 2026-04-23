@@ -1,4 +1,5 @@
 import SensorData from "../models/sensor.model.js";
+import { getLatestSensorSample, setLatestSensorSample } from "../state/liveSensorCache.js";
 
 const toNumber = (value) => {
   if (value === "" || value === undefined || value === null) {
@@ -18,6 +19,7 @@ export const saveSensorData = async (req, res) => {
       temperature: toNumber(req.body.temperature),
       spo2: toNumber(req.body.spo2),
       weight: toNumber(req.body.weight),
+      source: "live-stream",
     };
 
     if (
@@ -31,7 +33,17 @@ export const saveSensorData = async (req, res) => {
       });
     }
 
-    const data = await SensorData.create(payload);
+    // Live stream updates are kept in memory by default to avoid high-frequency DB churn.
+    setLatestSensorSample(payload);
+    let data = {
+      ...payload,
+      _id: undefined,
+      createdAt: new Date().toISOString(),
+    };
+
+    if (String(process.env.PERSIST_SENSOR_STREAM || "").trim().toLowerCase() === "true") {
+      data = await SensorData.create(payload);
+    }
 
     const io = req.app.get("io");
     if (io) {
@@ -46,6 +58,11 @@ export const saveSensorData = async (req, res) => {
 
 export const getLatestSensorData = async (_req, res) => {
   try {
+    const cached = getLatestSensorSample();
+    if (cached) {
+      return res.status(200).json(cached);
+    }
+
     const latest = await SensorData.findOne().sort({ createdAt: -1 });
     return res.status(200).json(latest);
   } catch (error) {

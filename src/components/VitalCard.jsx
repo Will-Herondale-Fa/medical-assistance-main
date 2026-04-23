@@ -1,16 +1,21 @@
 
 const VitalCard = ({ title, value, icon, onAdd, added = false }) => {
   return (
-    <div className="bg-white/95 border border-slate-200 p-6 rounded-2xl shadow-md text-center transition-transform duration-300 hover:scale-105 hover:shadow-lg">
-      <div className="flex justify-center mb-2">{icon}</div>
-      <h4 className="text-slate-500 text-sm font-medium">{title}</h4>
-      <p className="text-2xl font-bold mt-2 text-slate-900 animate-fade-in">{value}</p>
+    <div className="group relative overflow-hidden rounded-3xl border border-cyan-100 bg-white/90 p-6 text-center shadow-[0_16px_40px_rgba(8,145,178,0.12)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_26px_46px_rgba(8,145,178,0.2)]">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-cyan-400 via-sky-500 to-emerald-400 opacity-90" />
+      <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-cyan-50 text-cyan-700 ring-1 ring-cyan-100">
+        {icon}
+      </div>
+      <h4 className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{title}</h4>
+      <p className="mt-2 text-2xl font-black text-slate-900">{value}</p>
       {onAdd && (
         <button
           type="button"
           onClick={onAdd}
-          className={`mt-4 inline-flex items-center justify-center gap-1.5 text-white text-sm px-4 py-1.5 rounded-md transition ${
-            added ? "bg-emerald-600 hover:bg-emerald-600" : "bg-cyan-600 hover:bg-cyan-700"
+          className={`mt-4 inline-flex items-center justify-center gap-1.5 rounded-xl px-4 py-2 text-sm font-semibold text-white transition ${
+            added
+              ? "bg-emerald-600 hover:bg-emerald-600"
+              : "bg-gradient-to-r from-cyan-600 to-sky-600 hover:from-cyan-700 hover:to-sky-700"
           }`}
         >
           {added ? (

@@ -1,4 +1,5 @@
 import Patient from "../models/patient.model.js";
+import SensorData from "../models/sensor.model.js";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -61,6 +62,27 @@ export const createPatient = async (req, res) => {
     }
 
     const patient = await Patient.create(payload);
+
+    // Persist a vitals snapshot only when a prescription/patient record is saved.
+    const hasAnyVitals =
+      payload.pulse !== undefined ||
+      payload.temperature !== undefined ||
+      payload.spo2 !== undefined ||
+      payload.weight !== undefined;
+
+    if (hasAnyVitals) {
+      await SensorData.create({
+        patientId: patient._id,
+        patientName: payload.patientName,
+        deviceId: "",
+        source: "prescription",
+        heartRate: payload.pulse,
+        temperature: payload.temperature,
+        spo2: payload.spo2,
+        weight: payload.weight,
+      });
+    }
+
     return res.status(201).json(patient);
   } catch (error) {
     return res.status(500).json({ message: error.message });
