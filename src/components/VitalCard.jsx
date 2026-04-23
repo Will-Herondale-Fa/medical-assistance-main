@@ -1,9 +1,9 @@
 
 const VitalCard = ({ title, value, icon, onAdd, added = false }) => {
   return (
-    <div className="group relative overflow-hidden rounded-3xl border border-cyan-100 bg-white/90 p-6 text-center shadow-[0_16px_40px_rgba(8,145,178,0.12)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_26px_46px_rgba(8,145,178,0.2)]">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-cyan-400 via-sky-500 to-emerald-400 opacity-90" />
-      <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-cyan-50 text-cyan-700 ring-1 ring-cyan-100">
+    <div className="group relative overflow-hidden rounded-3xl border border-[#ead9c8] bg-white/92 p-6 text-center shadow-[0_16px_40px_rgba(145,90,55,0.14)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_26px_46px_rgba(100,70,45,0.22)]">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-[#c6775f] via-[#b45b3f] to-[#2f8f83] opacity-90" />
+      <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#fff4ea] text-[#9a4f38] ring-1 ring-[#edd5c2]">
         {icon}
       </div>
       <h4 className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{title}</h4>
@@ -14,8 +14,8 @@ const VitalCard = ({ title, value, icon, onAdd, added = false }) => {
           onClick={onAdd}
           className={`mt-4 inline-flex items-center justify-center gap-1.5 rounded-xl px-4 py-2 text-sm font-semibold text-white transition ${
             added
-              ? "bg-emerald-600 hover:bg-emerald-600"
-              : "bg-gradient-to-r from-cyan-600 to-sky-600 hover:from-cyan-700 hover:to-sky-700"
+              ? "bg-[#2f8f83] hover:bg-[#2f8f83]"
+              : "bg-gradient-to-r from-[#b45b3f] to-[#2f8f83] hover:brightness-95"
           }`}
         >
           {added ? (

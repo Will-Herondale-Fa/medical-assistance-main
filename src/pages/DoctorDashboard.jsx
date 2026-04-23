@@ -507,14 +507,14 @@ export default function DoctorDashboard() {
   );
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_#dff7ff_0%,_#edf9ff_28%,_#f8fbff_55%,_#eefbf4_100%)]">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(47,143,131,0.14)_0%,_rgba(255,248,238,1)_35%,_rgba(248,241,230,1)_65%,_rgba(244,237,227,1)_100%)]">
       {/* HEADER */}
-      <header className="sticky top-0 z-10 flex items-center justify-between border-b border-cyan-100 bg-white/85 px-6 py-4 backdrop-blur-md md:px-10">
+      <header className="sticky top-0 z-10 flex items-center justify-between border-b border-[#ead9c8] bg-white/80 px-6 py-4 backdrop-blur-md md:px-10">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-700">Medibot Clinical</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#8f4a35]">Medibot Clinical</p>
           <h1 className="text-lg font-black text-slate-900 md:text-xl">Doctor Dashboard</h1>
         </div>
-        <Link to="/" className="text-cyan-600 hover:underline">
+        <Link to="/" className="text-[#8f4a35] hover:underline">
           <button
           onClick={handleLogout}
           className="rounded-xl bg-rose-500 px-5 py-2 font-semibold text-white shadow-sm transition hover:bg-rose-600">
@@ -525,7 +525,7 @@ export default function DoctorDashboard() {
       </header>
 
       <div className="space-y-8 p-5 md:p-8">
-        <div className="flex flex-col gap-2 rounded-2xl border border-cyan-100 bg-white/85 px-4 py-3 text-sm text-slate-700 shadow-sm md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col gap-2 rounded-2xl border border-[#ead9c8] bg-white/85 px-4 py-3 text-sm text-slate-700 shadow-sm md:flex-row md:items-center md:justify-between">
           <p>
             Live Source: <span className="font-semibold text-slate-900">{livePatientLabel}</span>
           </p>
@@ -601,7 +601,7 @@ export default function DoctorDashboard() {
             <button
               type="button"
               onClick={() => setIsConsultationModalOpen(true)}
-              className="rounded-xl bg-gradient-to-r from-cyan-600 to-sky-600 px-8 py-3 text-base text-white shadow-lg shadow-cyan-200 transition hover:from-cyan-700 hover:to-sky-700 md:text-lg"
+              className="rounded-xl bg-gradient-to-r from-[#b45b3f] to-[#2f8f83] px-8 py-3 text-base text-white shadow-lg shadow-[#e6ccb9] transition hover:from-[#9f4f36] hover:to-[#27786e] md:text-lg"
             >
               Configure Consultation
             </button>
@@ -609,7 +609,7 @@ export default function DoctorDashboard() {
               type="button"
               onClick={handleOpenActiveConsultation}
               disabled={!activeConsultationLink}
-              className="bg-emerald-600 text-white text-base px-6 py-3 rounded-xl shadow-lg shadow-emerald-200 hover:bg-emerald-700 transition disabled:opacity-55 disabled:cursor-not-allowed"
+              className="bg-[#2f8f83] text-white text-base px-6 py-3 rounded-xl shadow-lg shadow-[#d8ece8] hover:bg-[#27786e] transition disabled:opacity-55 disabled:cursor-not-allowed"
             >
               Open Active Call
             </button>
@@ -623,14 +623,14 @@ export default function DoctorDashboard() {
             </button>
           </div>
 
-          <div className="mx-auto max-w-3xl rounded-2xl border border-cyan-100 bg-white/90 p-4 shadow-lg">
+          <div className="mx-auto max-w-3xl rounded-2xl border border-[#ead9c8] bg-white/90 p-4 shadow-lg">
             {activeConsultationLink ? (
               <div className="space-y-2">
                 <p className="text-sm text-slate-600">
                   Active platform: <span className="font-semibold text-slate-900">{activeConsultationPlatform}</span>
                 </p>
                 <p className="text-sm text-slate-600 break-all">
-                  Join URL: <span className="font-medium text-cyan-700">{activeConsultationLink}</span>
+                  Join URL: <span className="font-medium text-[#8f4a35]">{activeConsultationLink}</span>
                 </p>
                 {activeConsultationUpdatedAt ? (
                   <p className="text-xs text-slate-500">Last updated: {activeConsultationUpdatedAt}</p>
@@ -645,10 +645,10 @@ export default function DoctorDashboard() {
         </div>
 
         {/* PRESCRIPTION FORM */}
-        <div className="space-y-7 rounded-3xl border border-cyan-100 bg-white/95 p-6 shadow-xl shadow-cyan-100/60 md:p-8">
+        <div className="space-y-7 rounded-3xl border border-[#ead9c8] bg-white/95 p-6 shadow-xl shadow-[#ead9c8]/50 md:p-8">
           <div className="flex items-start justify-between gap-3">
             <h2 className="text-2xl font-bold text-slate-900">Prescription & Medical Record</h2>
-            <span className="hidden sm:inline-flex text-xs font-semibold tracking-wide uppercase bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full">
+            <span className="hidden sm:inline-flex text-xs font-semibold tracking-wide uppercase bg-[#e5f5f2] text-[#2f8f83] px-3 py-1 rounded-full">
               Doctor Entry
             </span>
           </div>
@@ -761,7 +761,7 @@ export default function DoctorDashboard() {
             <label className="block font-medium mb-1 text-slate-700">Diagnosis & Clinical Notes</label>
             <textarea
               rows="4"
-              className="w-full border border-slate-300 rounded-lg p-3 bg-slate-50/70 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition"
+              className="w-full border border-[#e3cfbb] rounded-lg p-3 bg-[#fffaf4] focus:outline-none focus:ring-2 focus:ring-[#2f8f83] focus:border-[#2f8f83] transition"
               placeholder="Enter diagnosis, symptoms, findings, and treatment notes"
               value={formData.diagnosis}
               onChange={(e) => setFormData({ ...formData, diagnosis: e.target.value })}
@@ -777,12 +777,12 @@ export default function DoctorDashboard() {
                 <input
                   list="common-medicines"
                   placeholder="Search or select medicine name"
-                  className="w-full border border-slate-300 rounded-lg p-2.5 bg-slate-50/70 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition"
+                  className="w-full border border-[#e3cfbb] rounded-lg p-2.5 bg-[#fffaf4] focus:outline-none focus:ring-2 focus:ring-[#2f8f83] focus:border-[#2f8f83] transition"
                   value={med.name}
                   onChange={(e) => handleMedicineChange(index, "name", e.target.value)}
                 />
                 <select
-                  className="w-full border border-slate-300 rounded-lg p-2.5 bg-slate-50/70 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition"
+                  className="w-full border border-[#e3cfbb] rounded-lg p-2.5 bg-[#fffaf4] focus:outline-none focus:ring-2 focus:ring-[#2f8f83] focus:border-[#2f8f83] transition"
                   value={med.type}
                   onChange={(e) => handleMedicineChange(index, "type", e.target.value)}
                 >
@@ -793,7 +793,7 @@ export default function DoctorDashboard() {
                 </select>
                 <input
                   placeholder="e.g. 1 tablet twice daily after meals"
-                  className="w-full border border-slate-300 rounded-lg p-2.5 bg-slate-50/70 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition"
+                  className="w-full border border-[#e3cfbb] rounded-lg p-2.5 bg-[#fffaf4] focus:outline-none focus:ring-2 focus:ring-[#2f8f83] focus:border-[#2f8f83] transition"
                   value={med.dosage}
                   onChange={(e) => handleMedicineChange(index, "dosage", e.target.value)}
                 />
@@ -808,7 +808,7 @@ export default function DoctorDashboard() {
             <button
               type="button"
               onClick={addMedicineRow}
-              className="bg-emerald-600 text-white px-6 py-2 rounded-lg hover:bg-emerald-700 shadow-sm"
+              className="bg-[#2f8f83] text-white px-6 py-2 rounded-lg hover:bg-[#27786e] shadow-sm"
             >
               Add Medicine
             </button>
@@ -831,14 +831,14 @@ export default function DoctorDashboard() {
               type="button"
               onClick={handlePrintLatestPrescription}
               disabled={!printAgentStatus.online}
-              className="bg-emerald-600 text-white px-6 py-2 rounded-lg hover:bg-emerald-700 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-[#2f8f83] text-white px-6 py-2 rounded-lg hover:bg-[#27786e] shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Print Latest PDF
             </button>
             <button
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className="bg-cyan-600 text-white px-6 py-2 rounded-lg hover:bg-cyan-700 shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
+              className="bg-[#b45b3f] text-white px-6 py-2 rounded-lg hover:bg-[#9f4f36] shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {isSubmitting ? "Saving..." : "Submit"}
             </button>
@@ -911,13 +911,13 @@ export default function DoctorDashboard() {
                           }))
                         }
                         placeholder="doctor-patient-live-room"
-                        className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
+                        className="w-full rounded-xl border border-[#e3cfbb] bg-[#fffaf4] px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2f8f83] focus:border-[#2f8f83]"
                       />
                     </div>
                     <button
                       type="button"
                       onClick={handleGenerateJitsiRoom}
-                      className="self-end rounded-xl border border-cyan-200 bg-cyan-50 px-4 py-3 text-cyan-700 hover:bg-cyan-100"
+                      className="self-end rounded-xl border border-[#e3cfbb] bg-[#fff4ea] px-4 py-3 text-[#8f4a35] hover:bg-[#fbeada]"
                     >
                       Generate Room
                     </button>
@@ -941,7 +941,7 @@ export default function DoctorDashboard() {
                           openMode: e.target.value === "in-app" ? "in-app" : "external",
                         }))
                       }
-                      className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
+                      className="w-full rounded-xl border border-[#e3cfbb] bg-[#fffaf4] px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2f8f83] focus:border-[#2f8f83]"
                     >
                       <option value="in-app" disabled={!jitsiCanEmbedInApp}>
                         Open inside patient dashboard (embedded Jitsi)
@@ -971,7 +971,7 @@ export default function DoctorDashboard() {
                       }))
                     }
                     placeholder="https://..."
-                    className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
+                    className="w-full rounded-xl border border-[#e3cfbb] bg-[#fffaf4] px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2f8f83] focus:border-[#2f8f83]"
                   />
                 </div>
               )}
@@ -990,7 +990,7 @@ export default function DoctorDashboard() {
                     }))
                   }
                   placeholder="Daily follow-up consultation"
-                  className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
+                  className="w-full rounded-xl border border-[#e3cfbb] bg-[#fffaf4] px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2f8f83] focus:border-[#2f8f83]"
                 />
               </div>
 
@@ -1023,7 +1023,7 @@ export default function DoctorDashboard() {
                 type="button"
                 onClick={() => handleConsultationLinkSubmit()}
                 disabled={isSavingConsultation}
-                className="rounded-xl bg-cyan-600 px-5 py-2 text-white hover:bg-cyan-700 disabled:opacity-60 disabled:cursor-not-allowed"
+                className="rounded-xl bg-[#b45b3f] px-5 py-2 text-white hover:bg-[#9f4f36] disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {isSavingConsultation ? "Sharing..." : "Share With Patient"}
               </button>
@@ -1031,7 +1031,7 @@ export default function DoctorDashboard() {
                 type="button"
                 onClick={() => handleConsultationLinkSubmit({ openAfterShare: true })}
                 disabled={isSavingConsultation}
-                className="rounded-xl bg-emerald-600 px-5 py-2 text-white hover:bg-emerald-700 disabled:opacity-60 disabled:cursor-not-allowed"
+                className="rounded-xl bg-[#2f8f83] px-5 py-2 text-white hover:bg-[#27786e] disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 Share And Start Now
               </button>

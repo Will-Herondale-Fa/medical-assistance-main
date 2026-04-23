@@ -33,11 +33,11 @@ const MediDispanserCard = () => {
 );
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white/80 p-4 shadow-md">
-      <h3 className="mb-1 text-lg font-bold text-slate-900">
+    <div className="rounded-2xl border border-[#ead9c8] bg-white/85 p-4 shadow-md">
+      <h3 className="mb-1 text-lg font-bold text-[#3d2c24]">
         Medicine Control Panel
       </h3>
-      <p className="mb-4 text-sm text-slate-600">
+      <p className="mb-4 text-sm text-[#6e5a50]">
         Trigger dispenser commands directly from the prescription workspace.
       </p>
 
