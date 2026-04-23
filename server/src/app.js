@@ -13,6 +13,15 @@ const app = express();
 app.use(cors(getExpressCorsOptions()));
 app.use(express.json());
 
+app.get("/", (_req, res) => {
+  res.status(200).json({
+    ok: true,
+    service: "medical-assistance-api",
+    message: "API is running",
+    health: "/api/health",
+  });
+});
+
 app.get("/api/health", (_req, res) => {
   res.status(200).json({ ok: true, message: "Server is healthy" });
 });
