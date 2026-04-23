@@ -28,7 +28,7 @@ app.get("/", (_req, res) => {
 
   res.status(200).json({
     ok: true,
-    service: "medical-assistance-api",
+    service: "medibot-api",
     message: "API is running",
     health: "/api/health",
   });

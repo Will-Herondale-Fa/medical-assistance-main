@@ -1,15 +1,15 @@
-@import url("https://fonts.googleapis.com/css2?family=Fraunces:wght@500;700&family=Manrope:wght@400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap");
 @import "tailwindcss";
 
 :root {
-  --ma-bg: #f6f0e7;
-  --ma-bg-soft: #fffaf4;
-  --ma-card: rgba(255, 252, 247, 0.85);
-  --ma-ink: #2f251f;
-  --ma-muted: #6d5a4f;
-  --ma-accent: #b45b3f;
-  --ma-accent-2: #2f8f83;
-  --ma-border: #ebddce;
+  --ma-bg: #ecf3ff;
+  --ma-bg-soft: #f7fbff;
+  --ma-card: rgba(255, 255, 255, 0.84);
+  --ma-ink: #0f1f3d;
+  --ma-muted: #4c5f83;
+  --ma-accent: #2563eb;
+  --ma-accent-2: #0f766e;
+  --ma-border: #cfe1ff;
 }
 
 html,
@@ -19,18 +19,18 @@ body,
 }
 
 body {
-  font-family: "Manrope", "Avenir Next", "Segoe UI", sans-serif;
+  font-family: "Outfit", "Segoe UI", sans-serif;
   color: var(--ma-ink);
   background:
-    radial-gradient(circle at 8% 10%, rgba(47, 143, 131, 0.14), transparent 32%),
-    radial-gradient(circle at 88% 12%, rgba(180, 91, 63, 0.18), transparent 30%),
-    linear-gradient(160deg, #fff8ef 0%, #f8f1e5 42%, #f3efe7 100%);
+    radial-gradient(circle at 10% 10%, rgba(37, 99, 235, 0.16), transparent 35%),
+    radial-gradient(circle at 88% 12%, rgba(15, 118, 110, 0.16), transparent 35%),
+    linear-gradient(165deg, #f4f8ff 0%, #eaf2ff 45%, #eff7ff 100%);
 }
 
 h1,
 h2,
 h3 {
-  font-family: "Fraunces", Georgia, serif;
+  font-family: "Space Grotesk", "Outfit", sans-serif;
 }
 
 

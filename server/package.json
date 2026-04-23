@@ -1,5 +1,5 @@
 {
-  "name": "medicalassistance-server",
+  "name": "medibot-server",
   "private": true,
   "version": "0.1.0",
   "type": "module",

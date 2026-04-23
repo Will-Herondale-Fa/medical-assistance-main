@@ -33,7 +33,7 @@ const MediDispanserCard = () => {
 );
 
   return (
-    <div className="rounded-2xl border border-[#ead9c8] bg-white/85 p-4 shadow-md">
+    <div className="rounded-2xl border border-[#dbeafe] bg-white/85 p-4 shadow-md">
       <h3 className="mb-1 text-lg font-bold text-[#3d2c24]">
         Medicine Control Panel
       </h3>

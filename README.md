@@ -1,6 +1,6 @@
-# Medical Assistance
+# Medibot
 
-Medical Assistance is a React + Node.js app for clinic workflows:
+Medibot is a React + Node.js app for clinic workflows:
 - Real-time vitals feed
 - Doctor dashboard and patient view
 - Prescription generation and print-agent integration
