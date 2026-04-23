@@ -1,13 +1,10 @@
 import mongoose from "mongoose";
+import { getEnvValue } from "./env.js";
 
 export const connectDB = async () => {
-  const env = typeof process !== "undefined" ? process.env : {};
   try {
-    if (!env.MONGO_URI) {
-      throw new Error("MONGO_URI is missing in environment variables");
-    }
-
-    await mongoose.connect(env.MONGO_URI);
+    const mongoUri = getEnvValue("MONGO_URI");
+    await mongoose.connect(mongoUri);
     console.log("MongoDB connected");
   } catch (error) {
     console.error("DB connection failed:", error.message);

@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { getEnvValue } from "../config/env.js";
 
 const base64UrlEncode = (value) =>
   Buffer.from(value, "utf8")
@@ -14,10 +15,7 @@ const base64UrlDecode = (value) => {
 };
 
 const getSecret = () => {
-  const secret = String(process.env.DOCTOR_AUTH_SECRET || "").trim();
-  if (!secret) {
-    throw new Error("DOCTOR_AUTH_SECRET is missing");
-  }
+  const secret = getEnvValue("DOCTOR_AUTH_SECRET");
   if (secret.length < 16) {
     throw new Error("DOCTOR_AUTH_SECRET must be at least 16 characters");
   }

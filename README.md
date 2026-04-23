@@ -15,20 +15,18 @@ Medical Assistance is a React + Node.js app for clinic workflows:
 - Consultation session management with platform validation
 - Optional in-app Jitsi patient embed mode
 
-## Required Backend Environment Variables
+## Backend Environment Variables
 
-The backend now fails fast on startup if any required variable is missing.
+You can now run without setting these manually because built-in defaults are applied:
 
-- `DOCTOR_EMAIL`
-- `DOCTOR_PASSWORD`
-- `DOCTOR_AUTH_SECRET`
-- `SENSOR_INGEST_SECRET`
-- `PRINT_AGENT_SECRET`
+- `DOCTOR_EMAIL` (default: `doctor@medibot.com`)
+- `DOCTOR_PASSWORD` (default: `doctor123`)
+- `DOCTOR_AUTH_SECRET` (default included)
+- `SENSOR_INGEST_SECRET` (default included)
+- `PRINT_AGENT_SECRET` (default included)
+- `MONGO_URI` (default: `mongodb://127.0.0.1:27017/medical-assist`)
 
-Also required for database connectivity:
-- `MONGO_URI`
-
-Use [server/.env.example](server/.env.example) as the template.
+Use [server/.env.example](server/.env.example) if you want to override.
 
 ## Frontend Environment Variables
 
@@ -72,7 +70,7 @@ This repo includes [render.yaml](render.yaml) for Blueprint deployment.
 3. Render will create:
 - `medical-assistance-api` (Node web service)
 - `medical-assistance-web` (Static site)
-4. Set backend env vars:
+4. Backend env vars are optional now due to defaults, but recommended to set your own values:
 - `MONGO_URI`
 - `DOCTOR_EMAIL`
 - `DOCTOR_PASSWORD`

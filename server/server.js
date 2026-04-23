@@ -6,7 +6,7 @@ import { Server } from "socket.io";
 import { WebSocketServer } from "ws";
 import app from "./src/app.js";
 import { connectDB } from "./src/config/db.js";
-import { validateRequiredEnv } from "./src/config/env.js";
+import { applyDefaultEnv, getEnvValue, validateRequiredEnv } from "./src/config/env.js";
 import { getSocketCorsOptions } from "./src/config/cors.js";
 import { startPrescriptionCleanupJob } from "./src/jobs/prescriptionCleanup.job.js";
 import { parseBearerToken, safeEquals } from "./src/middleware/auth.middleware.js";
@@ -35,6 +35,7 @@ if (envResult.error) {
 }
 
 try {
+  applyDefaultEnv();
   validateRequiredEnv();
 } catch (error) {
   console.error(`[startup] ${error.message}`);
@@ -180,13 +181,8 @@ io.use((socket, next) => {
   }
 
   if (requestedRole === ROLES.printAgent) {
-    const expectedSecret = String(process.env.PRINT_AGENT_SECRET || "").trim();
+    const expectedSecret = getEnvValue("PRINT_AGENT_SECRET");
     const providedSecret = String(socket.handshake.auth?.agentSecret || "").trim();
-
-    if (!expectedSecret) {
-      next(new Error("print agent auth is not configured on server"));
-      return;
-    }
 
     if (!providedSecret || !safeEquals(providedSecret, expectedSecret)) {
       next(new Error("unauthorized print agent socket"));

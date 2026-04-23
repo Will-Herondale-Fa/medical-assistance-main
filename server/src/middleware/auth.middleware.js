@@ -1,5 +1,6 @@
 import crypto from "node:crypto";
 import { verifyDoctorToken } from "../utils/doctorAuthToken.js";
+import { getEnvValue } from "../config/env.js";
 
 const parseBearerToken = (authorizationHeader) => {
   const value = String(authorizationHeader || "").trim();
@@ -33,10 +34,7 @@ export const requireDoctorAuth = (req, res, next) => {
 };
 
 export const requireSensorIngestSecret = (req, res, next) => {
-  const expected = String(process.env.SENSOR_INGEST_SECRET || "").trim();
-  if (!expected) {
-    return res.status(500).json({ message: "Sensor ingest auth is not configured on server" });
-  }
+  const expected = getEnvValue("SENSOR_INGEST_SECRET");
 
   const provided = String(req.headers["x-sensor-secret"] || "").trim();
   if (!provided || !safeEquals(provided, expected)) {

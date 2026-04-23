@@ -9,9 +9,9 @@ It listens for `printLatestPrescription` socket events and prints the latest pre
 npm run print-agent
 ```
 
-## Required environment variables
+## Environment variables
 
-- `PRINT_AGENT_SECRET` (must match backend `PRINT_AGENT_SECRET`)
+- `PRINT_AGENT_SECRET` (optional now; default is `print-agent-secret-1234`, must match backend)
 - Copy values from `print-agent/.env.example` as needed.
 
 ## Optional environment variables

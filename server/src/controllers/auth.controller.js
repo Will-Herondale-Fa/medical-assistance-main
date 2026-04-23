@@ -1,12 +1,9 @@
 import { createDoctorToken, verifyDoctorToken } from "../utils/doctorAuthToken.js";
+import { getEnvValue } from "../config/env.js";
 
 const getDoctorCredentials = () => {
-  const email = String(process.env.DOCTOR_EMAIL || "").trim().toLowerCase();
-  const password = String(process.env.DOCTOR_PASSWORD || "").trim();
-
-  if (!email || !password) {
-    return null;
-  }
+  const email = getEnvValue("DOCTOR_EMAIL").toLowerCase();
+  const password = getEnvValue("DOCTOR_PASSWORD");
 
   return { email, password };
 };
@@ -20,9 +17,6 @@ export const doctorLogin = (req, res) => {
   }
 
   const creds = getDoctorCredentials();
-  if (!creds) {
-    return res.status(500).json({ message: "Doctor login is not configured on server" });
-  }
   if (email !== creds.email || password !== creds.password) {
     return res.status(401).json({ message: "invalid credentials" });
   }

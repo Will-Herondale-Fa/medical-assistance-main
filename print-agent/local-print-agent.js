@@ -8,7 +8,7 @@ const { print } = pkg;
 
 const API_BASE_URL = process.env.PRINT_AGENT_API_BASE_URL || "http://localhost:4000/api";
 const SOCKET_URL = process.env.PRINT_AGENT_SOCKET_URL || "http://localhost:4000";
-const PRINT_AGENT_SECRET = String(process.env.PRINT_AGENT_SECRET || "").trim();
+const PRINT_AGENT_SECRET = String(process.env.PRINT_AGENT_SECRET || "print-agent-secret-1234").trim();
 
 const PRINTER_NAME = process.env.PRINT_AGENT_PRINTER_NAME || undefined;
 const OUT_DIR = path.join(os.tmpdir(), "medibot-print-agent");
@@ -300,11 +300,6 @@ const printLatestPrescription = async (patientFromEvent) => {
     isPrinting = false;
   }
 };
-
-if (!PRINT_AGENT_SECRET) {
-  console.error("[print-agent] Missing PRINT_AGENT_SECRET. Exiting for security.");
-  process.exit(1);
-}
 
 const socket = io(SOCKET_URL, {
   transports: ["websocket", "polling"],
