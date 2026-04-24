@@ -5,7 +5,6 @@ import socket, { refreshSocketAuth } from "../socket/socket";
 import VitalCard from "../components/VitalCard";
 import InputField from "../components/InputField";
 import MediDispanserCard from "../components/MediDispanserCard";
-import MedicineAdminPanel from "../components/MedicineAdminPanel";
 import { commonMedicines } from "../utils/commonMedicines";
 import { clearDoctorToken } from "../utils/auth";
 import {
@@ -22,7 +21,6 @@ import {
   findTrackedMedicine,
   getMedicineStatus,
   readMedicineAdminItems,
-  writeMedicineAdminItems,
 } from "../utils/medicineAdmin";
 
 const CONSULTATION_CREATOR_LINKS = {
@@ -38,8 +36,7 @@ export default function DoctorDashboard() {
   const [espStatus, setEspStatus] = useState({ online: false, lastSeenAt: "", deviceId: "" });
   const [doctorAlerts, setDoctorAlerts] = useState([]);
   const [medicines, setMedicines] = useState([{ name: "", type: "", dosage: "" }]);
-  const [showMedicineAdmin, setShowMedicineAdmin] = useState(false);
-  const [medicineAdminItems, setMedicineAdminItems] = useState(() => readMedicineAdminItems());
+  const [medicineAdminItems] = useState(() => readMedicineAdminItems());
   const [isConsultationModalOpen, setIsConsultationModalOpen] = useState(false);
   const [activeConsultation, setActiveConsultation] = useState(null);
   const [consultationDraft, setConsultationDraft] = useState(() => ({
@@ -367,10 +364,6 @@ export default function DoctorDashboard() {
     consultationDraft.meetingLink,
     consultationDraft.roomName,
   ]);
-
-  useEffect(() => {
-    writeMedicineAdminItems(medicineAdminItems);
-  }, [medicineAdminItems]);
 
   const handleMedicineChange = (index, field, value) => {
     const updated = [...medicines];
@@ -994,21 +987,7 @@ export default function DoctorDashboard() {
             >
               Add Medicine
             </button>
-            <button
-              type="button"
-              onClick={() => setShowMedicineAdmin((prev) => !prev)}
-              className="ml-2 border border-blue-200 bg-white text-blue-700 px-6 py-2 rounded-lg hover:bg-blue-50 shadow-sm"
-            >
-              {showMedicineAdmin ? "Hide Admin Panel" : "Open Medicine Admin"}
-            </button>
           </div>
-
-          {showMedicineAdmin ? (
-            <MedicineAdminPanel
-              items={medicineAdminItems}
-              onChange={setMedicineAdminItems}
-            />
-          ) : null}
 
           {/* ACTION BUTTONS */}
           <div className="flex justify-end gap-4 pt-4">

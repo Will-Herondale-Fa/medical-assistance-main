@@ -1,9 +1,21 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  isMedicineAdminAuthenticated,
+  setMedicineAdminAuthenticated,
+  verifyMedicineAdminCredentials,
+} from "../utils/medicineAdminAuth";
+
+const MEDICINE_ADMIN_ROUTE = "/_sys/med-admin-console-7x9";
 
 export default function LandingPage() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("patient");
   const [espStatus, setEspStatus] = useState({ online: false, deviceId: "", lastSeenAt: "" });
+  const [isAdminGateOpen, setIsAdminGateOpen] = useState(false);
+  const [adminUsername, setAdminUsername] = useState("");
+  const [adminPassword, setAdminPassword] = useState("");
+  const [adminError, setAdminError] = useState("");
 
   useEffect(() => {
     let mounted = true;
@@ -42,8 +54,39 @@ export default function LandingPage() {
     };
   }, []);
 
+  const openAdminGate = () => {
+    if (isMedicineAdminAuthenticated()) {
+      navigate(MEDICINE_ADMIN_ROUTE);
+      return;
+    }
+
+    setAdminError("");
+    setAdminUsername("");
+    setAdminPassword("");
+    setIsAdminGateOpen(true);
+  };
+
+  const closeAdminGate = () => {
+    setIsAdminGateOpen(false);
+    setAdminError("");
+  };
+
+  const handleAdminLogin = (event) => {
+    event.preventDefault();
+
+    const isValid = verifyMedicineAdminCredentials(adminUsername, adminPassword);
+    if (!isValid) {
+      setAdminError("Invalid credentials.");
+      return;
+    }
+
+    setMedicineAdminAuthenticated(true);
+    setIsAdminGateOpen(false);
+    navigate(MEDICINE_ADMIN_ROUTE);
+  };
+
   return (
-    <div className="min-h-screen flex flex-col bg-[radial-gradient(circle_at_12%_10%,_rgba(37,99,235,0.18),_transparent_34%),radial-gradient(circle_at_85%_14%,_rgba(15,118,110,0.2),_transparent_32%),linear-gradient(150deg,_#f4f8ff_0%,_#ecf4ff_42%,_#f1f9ff_100%)] animate-fade-in">
+    <div className="relative min-h-screen flex flex-col bg-[radial-gradient(circle_at_12%_10%,_rgba(37,99,235,0.18),_transparent_34%),radial-gradient(circle_at_85%_14%,_rgba(15,118,110,0.2),_transparent_32%),linear-gradient(150deg,_#f4f8ff_0%,_#ecf4ff_42%,_#f1f9ff_100%)] animate-fade-in">
       {/* Header */}
       <header className="flex justify-between items-center px-8 py-6 bg-white/75 shadow-lg backdrop-blur-md border-b border-blue-100">
         <div className="flex items-center gap-3">
@@ -168,9 +211,70 @@ export default function LandingPage() {
       </div>
 
       {/* Footer */}
-      <footer className="text-center py-6 text-slate-500 text-sm animate-fade-in">
-        © {new Date().getFullYear()} Medibot. All rights reserved.
+      <footer className="flex items-center justify-center gap-2 py-6 text-center text-sm text-slate-500 animate-fade-in">
+        <span>© {new Date().getFullYear()} Medibot. All rights reserved.</span>
+        <button
+          type="button"
+          onClick={openAdminGate}
+          aria-label="Open staff access"
+          className="rounded-full px-2 text-[10px] font-black text-slate-300 transition hover:text-slate-500"
+        >
+          •
+        </button>
       </footer>
+
+      {isAdminGateOpen ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 px-4">
+          <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h2 className="text-xl font-bold text-slate-900">Restricted Access</h2>
+                <p className="mt-1 text-xs text-slate-500">
+                  Authorized inventory admins only.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={closeAdminGate}
+                className="text-xl leading-none text-slate-400 hover:text-slate-700"
+                aria-label="Close"
+              >
+                ×
+              </button>
+            </div>
+
+            <form className="mt-5 space-y-3" onSubmit={handleAdminLogin}>
+              <input
+                type="text"
+                placeholder="Username"
+                value={adminUsername}
+                onChange={(event) => setAdminUsername(event.target.value)}
+                className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-2.5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                autoComplete="username"
+              />
+              <input
+                type="password"
+                placeholder="Password"
+                value={adminPassword}
+                onChange={(event) => setAdminPassword(event.target.value)}
+                className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-2.5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                autoComplete="current-password"
+              />
+
+              {adminError ? (
+                <p className="text-sm font-medium text-rose-600">{adminError}</p>
+              ) : null}
+
+              <button
+                type="submit"
+                className="w-full rounded-xl bg-blue-600 px-4 py-2.5 font-semibold text-white hover:bg-blue-700"
+              >
+                Sign In
+              </button>
+            </form>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 
