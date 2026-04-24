@@ -1,8 +1,46 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 export default function LandingPage() {
   const [activeTab, setActiveTab] = useState("patient");
+  const [espStatus, setEspStatus] = useState({ online: false, deviceId: "", lastSeenAt: "" });
+
+  useEffect(() => {
+    let mounted = true;
+    const checkStatus = async () => {
+      try {
+        const res = await fetch("/api/sensors/latest");
+        if (!res.ok) {
+          return;
+        }
+        const data = await res.json();
+        if (!mounted) {
+          return;
+        }
+        if (data?.createdAt) {
+          const ageMs = Date.now() - new Date(data.createdAt).getTime();
+          setEspStatus({
+            online: ageMs <= 45_000,
+            deviceId: data.deviceId || "",
+            lastSeenAt: data.createdAt,
+          });
+        } else {
+          setEspStatus((prev) => ({ ...prev, online: false }));
+        }
+      } catch {
+        if (mounted) {
+          setEspStatus((prev) => ({ ...prev, online: false }));
+        }
+      }
+    };
+
+    checkStatus();
+    const timer = setInterval(checkStatus, 10000);
+    return () => {
+      mounted = false;
+      clearInterval(timer);
+    };
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col bg-[radial-gradient(circle_at_12%_10%,_rgba(37,99,235,0.18),_transparent_34%),radial-gradient(circle_at_85%_14%,_rgba(15,118,110,0.2),_transparent_32%),linear-gradient(150deg,_#f4f8ff_0%,_#ecf4ff_42%,_#f1f9ff_100%)] animate-fade-in">
@@ -17,9 +55,15 @@ export default function LandingPage() {
           </span>
           <h1 className="text-3xl font-extrabold text-blue-800 tracking-tight animate-fade-in">Medibot</h1>
         </div>
-        <span className="rounded-full border border-teal-200 bg-teal-50 px-4 py-2 text-sm font-semibold text-teal-700">
-          System Online
-        </span>
+        <div
+          className={`rounded-full border px-4 py-2 text-sm font-semibold ${
+            espStatus.online
+              ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+              : "border-rose-200 bg-rose-50 text-rose-700"
+          }`}
+        >
+          {espStatus.online ? "ESP32 Online" : "ESP32 Offline"}
+        </div>
       </header>
 
       {/* Hero Section */}

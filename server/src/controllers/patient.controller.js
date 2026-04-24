@@ -83,6 +83,17 @@ export const createPatient = async (req, res) => {
       });
     }
 
+    const io = req.app.get("io");
+    if (io) {
+      const payload = {
+        patientId: patient._id,
+        createdAt: patient.createdAt,
+        patient,
+      };
+      io.to("role:doctor").emit("prescriptionCreated", payload);
+      io.to("role:patient").emit("prescriptionCreated", payload);
+    }
+
     return res.status(201).json(patient);
   } catch (error) {
     return res.status(500).json({ message: error.message });

@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../api/axios";
 import socket, { refreshSocketAuth } from "../socket/socket";
 import VitalCard from "../components/VitalCard";
 import InputField from "../components/InputField";
 import MediDispanserCard from "../components/MediDispanserCard";
+import MedicineAdminPanel from "../components/MedicineAdminPanel";
 import { commonMedicines } from "../utils/commonMedicines";
 import { clearDoctorToken } from "../utils/auth";
 import {
@@ -17,6 +18,12 @@ import {
   platformLabel,
   supportedConsultationPlatforms,
 } from "../utils/consultation";
+import {
+  findTrackedMedicine,
+  getMedicineStatus,
+  readMedicineAdminItems,
+  writeMedicineAdminItems,
+} from "../utils/medicineAdmin";
 
 const CONSULTATION_CREATOR_LINKS = {
   "google-meet": "https://meet.google.com/new",
@@ -25,8 +32,14 @@ const CONSULTATION_CREATOR_LINKS = {
 };
 
 export default function DoctorDashboard() {
+  const cToF = (c) => Number(c) * (9 / 5) + 32;
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [temperatureUnit, setTemperatureUnit] = useState("C");
+  const [espStatus, setEspStatus] = useState({ online: false, lastSeenAt: "", deviceId: "" });
+  const [doctorAlerts, setDoctorAlerts] = useState([]);
   const [medicines, setMedicines] = useState([{ name: "", type: "", dosage: "" }]);
+  const [showMedicineAdmin, setShowMedicineAdmin] = useState(false);
+  const [medicineAdminItems, setMedicineAdminItems] = useState(() => readMedicineAdminItems());
   const [isConsultationModalOpen, setIsConsultationModalOpen] = useState(false);
   const [activeConsultation, setActiveConsultation] = useState(null);
   const [consultationDraft, setConsultationDraft] = useState(() => ({
@@ -63,6 +76,14 @@ export default function DoctorDashboard() {
     spo2: false,
     weight: false,
   });
+
+  const pushDoctorAlert = (message, tone = "info") => {
+    const id = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+    setDoctorAlerts((prev) => [...prev, { id, message, tone }]);
+    setTimeout(() => {
+      setDoctorAlerts((prev) => prev.filter((item) => item.id !== id));
+    }, 5000);
+  };
 
   // Listen for real-time sensor updates
   useEffect(() => {
@@ -112,6 +133,15 @@ export default function DoctorDashboard() {
         const res = await api.get("/sensors/latest");
         if (mounted) {
           setSensorData(res.data || null);
+          if (res.data?.createdAt) {
+            setEspStatus({
+              online: true,
+              lastSeenAt: res.data.createdAt,
+              deviceId: res.data.deviceId || "",
+            });
+          } else {
+            setEspStatus((prev) => ({ ...prev, online: false }));
+          }
         }
       } catch (error) {
         console.error("Latest sensor fetch failed:", error);
@@ -141,6 +171,11 @@ export default function DoctorDashboard() {
       }
       console.log("Live Sensor:", data);
       setSensorData(data);
+      setEspStatus({
+        online: true,
+        lastSeenAt: data.createdAt || new Date().toISOString(),
+        deviceId: data.deviceId || "",
+      });
     };
     const handleSocketConnect = () => {
       fetchLatestSensor();
@@ -167,11 +202,16 @@ export default function DoctorDashboard() {
     const handleConnectError = (error) => {
       console.error("Socket connection failed:", error.message);
     };
+    const handlePrescriptionCreated = (data) => {
+      const patientName = String(data?.patient?.patientName || "").trim() || "New patient";
+      pushDoctorAlert(`${patientName} registered successfully.`, "success");
+    };
 
     socket.on("consultationLinkUpdated", handleConsultationLinkUpdated);
     socket.on("consultationLinkError", handleConsultationLinkError);
     socket.on("printAgentStatusUpdated", handlePrintAgentStatusUpdated);
     socket.on("connect_error", handleConnectError);
+    socket.on("prescriptionCreated", handlePrescriptionCreated);
 
     return () => {
       mounted = false;
@@ -181,6 +221,7 @@ export default function DoctorDashboard() {
       socket.off("consultationLinkError", handleConsultationLinkError);
       socket.off("printAgentStatusUpdated", handlePrintAgentStatusUpdated);
       socket.off("connect_error", handleConnectError);
+      socket.off("prescriptionCreated", handlePrescriptionCreated);
     };
   }, []);
 
@@ -206,6 +247,36 @@ export default function DoctorDashboard() {
       return;
     }
 
+    const selectedTrackedMedicines = payload.medicines
+      .map((med) => {
+        const tracked = findTrackedMedicine(medicineAdminItems, med.name);
+        if (!tracked) {
+          return null;
+        }
+        return { medName: med.name, tracked, status: getMedicineStatus(tracked) };
+      })
+      .filter(Boolean);
+
+    const expired = selectedTrackedMedicines.filter((item) => item.status.tone === "danger");
+    if (expired.length > 0) {
+      alert(
+        `Cannot submit. Expired medicines selected: ${expired
+          .map((item) => item.medName)
+          .join(", ")}`
+      );
+      return;
+    }
+
+    const warned = selectedTrackedMedicines.filter(
+      (item) => item.status.tone === "warn"
+    );
+    if (warned.length > 0) {
+      pushDoctorAlert(
+        `Warning: ${warned.map((item) => `${item.medName} (${item.status.label})`).join(", ")}`,
+        "warn"
+      );
+    }
+
     try {
       setIsSubmitting(true);
       const res = await api.post("/patients", payload);
@@ -216,7 +287,7 @@ export default function DoctorDashboard() {
       });
       setLatestPatientDetails(res.data);
       console.log("Latest patient details:", res.data);
-      alert("Patient and prescription saved successfully.");
+      pushDoctorAlert("Patient and prescription saved successfully.", "success");
       console.log(res.data);
 
       setFormData({
@@ -251,13 +322,21 @@ export default function DoctorDashboard() {
 
   useEffect(() => {
     const timer = setInterval(() => {
+      let hasFreshSignal = false;
       setSensorData((prev) => {
         if (!prev?.createdAt) {
           return prev;
         }
         const ageMs = Date.now() - new Date(prev.createdAt).getTime();
-        return ageMs > 45_000 ? null : prev;
+        if (ageMs <= 45_000) {
+          hasFreshSignal = true;
+          return prev;
+        }
+        return null;
       });
+      if (!hasFreshSignal) {
+        setEspStatus((prev) => ({ ...prev, online: false }));
+      }
     }, 5000);
     return () => clearInterval(timer);
   }, []);
@@ -288,6 +367,10 @@ export default function DoctorDashboard() {
     consultationDraft.meetingLink,
     consultationDraft.roomName,
   ]);
+
+  useEffect(() => {
+    writeMedicineAdminItems(medicineAdminItems);
+  }, [medicineAdminItems]);
 
   const handleMedicineChange = (index, field, value) => {
     const updated = [...medicines];
@@ -471,7 +554,13 @@ export default function DoctorDashboard() {
     }, 700);
   };
 
-  const liveTemperature = sensorData?.temperature ?? "--";
+  const liveTemperatureC = sensorData?.temperature;
+  const liveTemperatureDisplay =
+    liveTemperatureC === undefined || liveTemperatureC === null
+      ? "--"
+      : temperatureUnit === "F"
+      ? `${cToF(liveTemperatureC).toFixed(1)} F`
+      : `${Number(liveTemperatureC).toFixed(1)} C`;
   const liveHeartRate = sensorData?.heartRate ?? "--";
   const liveWeight = sensorData?.weight ?? "--";
   const lastUpdated = sensorData?.createdAt
@@ -505,6 +594,20 @@ export default function DoctorDashboard() {
   const jitsiCanEmbedInApp = canUseInAppJitsiEmbed(
     consultationDraft.meetingLink || jitsiPreviewLink
   );
+  const espStatusText = espStatus.online ? "ESP32 Online" : "ESP32 Offline";
+  const espMetaText = espStatus.online
+    ? `Last seen ${espStatus.lastSeenAt ? new Date(espStatus.lastSeenAt).toLocaleTimeString() : "just now"}${
+        espStatus.deviceId ? ` • ${espStatus.deviceId}` : ""
+      }`
+    : `No fresh signal in last 45s${espStatus.deviceId ? ` • ${espStatus.deviceId}` : ""}`;
+  const getTrackedMedicineMeta = (name) => {
+    const tracked = findTrackedMedicine(medicineAdminItems, name);
+    if (!tracked) {
+      return { label: "Not Tracked", tone: "neutral" };
+    }
+    const status = getMedicineStatus(tracked);
+    return { label: status.label, tone: status.tone };
+  };
 
   return (
     <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(47,143,131,0.14)_0%,_rgba(255,248,238,1)_35%,_rgba(248,241,230,1)_65%,_rgba(244,237,227,1)_100%)]">
@@ -514,17 +617,48 @@ export default function DoctorDashboard() {
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#1e3a8a]">Medibot Clinical</p>
           <h1 className="text-lg font-black text-slate-900 md:text-xl">Doctor Dashboard</h1>
         </div>
-        <Link to="/" className="text-[#1e3a8a] hover:underline">
-          <button
-          onClick={handleLogout}
-          className="rounded-xl bg-rose-500 px-5 py-2 font-semibold text-white shadow-sm transition hover:bg-rose-600">
-          Logout
-          </button>
-        </Link>
+        <div className="flex items-center gap-3">
+          <div
+            className={`rounded-xl border px-3 py-2 text-right text-xs ${
+              espStatus.online
+                ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                : "border-rose-200 bg-rose-50 text-rose-700"
+            }`}
+          >
+            <p className="font-semibold">{espStatusText}</p>
+            <p>{espMetaText}</p>
+          </div>
+          <Link to="/" className="text-[#1e3a8a] hover:underline">
+            <button
+            onClick={handleLogout}
+            className="rounded-xl bg-rose-500 px-5 py-2 font-semibold text-white shadow-sm transition hover:bg-rose-600">
+            Logout
+            </button>
+          </Link>
+        </div>
       
       </header>
 
       <div className="space-y-8 p-5 md:p-8">
+        {doctorAlerts.length > 0 ? (
+          <div className="space-y-2">
+            {doctorAlerts.map((item) => (
+              <div
+                key={item.id}
+                className={`rounded-xl border px-4 py-2 text-sm ${
+                  item.tone === "success"
+                    ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                    : item.tone === "warn"
+                    ? "border-amber-200 bg-amber-50 text-amber-700"
+                    : "border-blue-200 bg-blue-50 text-blue-700"
+                }`}
+              >
+                {item.message}
+              </div>
+            ))}
+          </div>
+        ) : null}
+
         <div className="flex flex-col gap-2 rounded-2xl border border-[#dbeafe] bg-white/85 px-4 py-3 text-sm text-slate-700 shadow-sm md:flex-row md:items-center md:justify-between">
           <p>
             Live Source: <span className="font-semibold text-slate-900">{livePatientLabel}</span>
@@ -532,6 +666,32 @@ export default function DoctorDashboard() {
           <p>
             Last Update: <span className="font-semibold text-slate-900">{lastUpdated}</span>
           </p>
+        </div>
+
+        <div className="flex items-center justify-end gap-2 text-sm">
+          <span className="text-slate-600">Temperature unit:</span>
+          <button
+            type="button"
+            onClick={() => setTemperatureUnit("C")}
+            className={`rounded-lg border px-3 py-1.5 font-semibold ${
+              temperatureUnit === "C"
+                ? "border-blue-300 bg-blue-600 text-white"
+                : "border-blue-200 bg-white text-blue-700"
+            }`}
+          >
+            C
+          </button>
+          <button
+            type="button"
+            onClick={() => setTemperatureUnit("F")}
+            className={`rounded-lg border px-3 py-1.5 font-semibold ${
+              temperatureUnit === "F"
+                ? "border-blue-300 bg-blue-600 text-white"
+                : "border-blue-200 bg-white text-blue-700"
+            }`}
+          >
+            F
+          </button>
         </div>
 
         {/* VITALS DASHBOARD */}
@@ -547,9 +707,9 @@ export default function DoctorDashboard() {
             }
           />
           <VitalCard
-            title="Temp (deg C)"
-            value={liveTemperature === "--" ? "--" : `${liveTemperature} C`}
-            onAdd={() => addVitalToPrescription("temperature", liveTemperature)}
+            title={`Temp (${temperatureUnit})`}
+            value={liveTemperatureDisplay}
+            onAdd={() => addVitalToPrescription("temperature", liveTemperatureC)}
             added={addedVitals.temperature}
             icon={
               <svg className="w-12 h-12 text-rose-400 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -773,30 +933,52 @@ export default function DoctorDashboard() {
             <h3 className="font-semibold text-lg text-slate-900">Prescribed Medications</h3>
 
             {medicines.map((med, index) => (
-              <div key={index} className="grid md:grid-cols-3 gap-4">
-                <input
-                  list="common-medicines"
-                  placeholder="Search or select medicine name"
-                  className="w-full border border-[#bfdbfe] rounded-lg p-2.5 bg-[#f8fbff] focus:outline-none focus:ring-2 focus:ring-[#0f766e] focus:border-[#0f766e] transition"
-                  value={med.name}
-                  onChange={(e) => handleMedicineChange(index, "name", e.target.value)}
-                />
-                <select
-                  className="w-full border border-[#bfdbfe] rounded-lg p-2.5 bg-[#f8fbff] focus:outline-none focus:ring-2 focus:ring-[#0f766e] focus:border-[#0f766e] transition"
-                  value={med.type}
-                  onChange={(e) => handleMedicineChange(index, "type", e.target.value)}
-                >
-                  <option value="">Select medication type</option>
-                  <option>Tablet</option>
-                  <option>Syrup</option>
-                  <option>Injection</option>
-                </select>
-                <input
-                  placeholder="e.g. 1 tablet twice daily after meals"
-                  className="w-full border border-[#bfdbfe] rounded-lg p-2.5 bg-[#f8fbff] focus:outline-none focus:ring-2 focus:ring-[#0f766e] focus:border-[#0f766e] transition"
-                  value={med.dosage}
-                  onChange={(e) => handleMedicineChange(index, "dosage", e.target.value)}
-                />
+              <div key={index} className="space-y-2">
+                <div className="grid md:grid-cols-3 gap-4">
+                  <input
+                    list="common-medicines"
+                    placeholder="Search or select medicine name"
+                    className="w-full border border-[#bfdbfe] rounded-lg p-2.5 bg-[#f8fbff] focus:outline-none focus:ring-2 focus:ring-[#0f766e] focus:border-[#0f766e] transition"
+                    value={med.name}
+                    onChange={(e) => handleMedicineChange(index, "name", e.target.value)}
+                  />
+                  <select
+                    className="w-full border border-[#bfdbfe] rounded-lg p-2.5 bg-[#f8fbff] focus:outline-none focus:ring-2 focus:ring-[#0f766e] focus:border-[#0f766e] transition"
+                    value={med.type}
+                    onChange={(e) => handleMedicineChange(index, "type", e.target.value)}
+                  >
+                    <option value="">Select medication type</option>
+                    <option>Tablet</option>
+                    <option>Syrup</option>
+                    <option>Injection</option>
+                  </select>
+                  <input
+                    placeholder="e.g. 1 tablet twice daily after meals"
+                    className="w-full border border-[#bfdbfe] rounded-lg p-2.5 bg-[#f8fbff] focus:outline-none focus:ring-2 focus:ring-[#0f766e] focus:border-[#0f766e] transition"
+                    value={med.dosage}
+                    onChange={(e) => handleMedicineChange(index, "dosage", e.target.value)}
+                  />
+                </div>
+                {med.name?.trim() ? (
+                  <div>
+                    {(() => {
+                      const meta = getTrackedMedicineMeta(med.name);
+                      const toneClass =
+                        meta.tone === "danger"
+                          ? "border-rose-200 bg-rose-50 text-rose-700"
+                          : meta.tone === "warn"
+                          ? "border-amber-200 bg-amber-50 text-amber-700"
+                          : meta.tone === "ok"
+                          ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                          : "border-slate-200 bg-slate-50 text-slate-600";
+                      return (
+                        <span className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold ${toneClass}`}>
+                          {meta.label}
+                        </span>
+                      );
+                    })()}
+                  </div>
+                ) : null}
               </div>
             ))}
             <datalist id="common-medicines">
@@ -812,7 +994,21 @@ export default function DoctorDashboard() {
             >
               Add Medicine
             </button>
+            <button
+              type="button"
+              onClick={() => setShowMedicineAdmin((prev) => !prev)}
+              className="ml-2 border border-blue-200 bg-white text-blue-700 px-6 py-2 rounded-lg hover:bg-blue-50 shadow-sm"
+            >
+              {showMedicineAdmin ? "Hide Admin Panel" : "Open Medicine Admin"}
+            </button>
           </div>
+
+          {showMedicineAdmin ? (
+            <MedicineAdminPanel
+              items={medicineAdminItems}
+              onChange={setMedicineAdminItems}
+            />
+          ) : null}
 
           {/* ACTION BUTTONS */}
           <div className="flex justify-end gap-4 pt-4">
